@@ -223,8 +223,13 @@ function run_chroot_cmd_apt_update {
 function create_rootfs {
 	local image_filename=$1
 
+	# Dynamically find the .img.xz file if no argument is provided
+	if [ -z "$image_filename" ]; then
+		image_filename=$(find . -maxdepth 1 -type f -name "*.img.xz" | head -n 1)
+	fi
+
 	echo "RaspiOS image file name : ${image_filename}"
-	if [ ! -e ${image_filename} ]; then
+	if [ -z "$image_filename" ] || [ ! -e "$image_filename" ]; then
 		echo "RaspiOS image not found"
 		exit 5
 	fi
@@ -283,6 +288,7 @@ CURRENT_WORKING_DIR=${PWD}
 case ${args[0]} in
 download)
 	is_command_installed wget
+	find "$image_dir" -maxdepth 1 -type f -name "*.img.xz" -exec rm -v {} \;
 	wget --trust-server-names https://downloads.raspberrypi.org/raspios_armhf_latest
 	;;
 create)
