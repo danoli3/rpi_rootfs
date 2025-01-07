@@ -89,7 +89,7 @@ function extract_zip_and_mount_image {
 	local extracted_image_filename=${filename_without_ext}.img
 
 	## Extracting RaspiOS image from zip file
-	if [ ${extension} == "zip" ]; then
+	if [ "${extension}" == "zip" ]; then
 		# this unzip wll extract the OS image file on current directory
 		unzip ${image_filename}
 		ret_value=$?
@@ -98,11 +98,11 @@ function extract_zip_and_mount_image {
 			echo "Error: Failed to execute unzip ${image_filename}"
 			exit 1
 		fi
-	elif [ ${extension} == "img" ]; then
+	elif [ "${extension}" == "img" ]; then
 		extracted_image_filename=${image_filename}
 		echo "Using OS image file : ${extracted_image_filename}"
 	else
-		echo "Error: unsuppored RaspiOS image type ${image_filename}"
+		echo "Error: unsuppored RaspiOS image type ${image_filename} and extension:${extension}"
 		exit 2
 	fi
 

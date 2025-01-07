@@ -86,7 +86,7 @@ function extract_zip_and_mount_image {
 	local extracted_image_filename=${filename_without_ext}.img
 
 	## Extracting RaspiOS image from zip file
-	if [ ${extension} == "zip" ]; then
+	if [ "${extension}" == "zip" ]; then
 		# this unzip wll extract the OS image file on current directory
 		unzip ${image_filename}
 		ret_value=$?
@@ -95,11 +95,11 @@ function extract_zip_and_mount_image {
 			echo "Error: Failed to execute unzip ${image_filename}"
 			exit 1
 		fi
-	elif [ ${extension} == "img" ]; then
+	elif [ "${extension}" == "img" ]; then
 		extracted_image_filename=${image_filename}
 		echo "Using OS image file : ${extracted_image_filename}"
 	else
-		echo "Error: unsuppored RaspiOS image type ${image_filename}"
+		echo "Error: unsuppored RaspiOS image type ${image_filename} extension:${extension}"
 		exit 2
 	fi
 
@@ -225,7 +225,7 @@ function create_rootfs {
 
 	# Dynamically find the .img.xz file if no argument is provided
 	if [ -z "$image_filename" ]; then
-		image_filename=$(find . -maxdepth 1 -type f -name "*.img.xz" | head -n 1)
+		export image_filename=$(find . -maxdepth 1 -type f -name "*.img.xz" | head -n 1)
 	fi
 
 	echo "RaspiOS image file name : ${image_filename}"
@@ -235,7 +235,7 @@ function create_rootfs {
 	fi
 
 	mkdir -p ${RPI_ROOTFS_BASE}
-	extract_zip_and_mount_image ${image_filename}
+	extract_zip_and_mount_image "${image_filename}"
 	copy_files_from_image
 	update_and_install_raspi_os_imsage
 	create_symlinks

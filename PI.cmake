@@ -4,7 +4,7 @@ set(CMAKE_SYSTEM_VERSION 1)
 set(CMAKE_SYSTEM_PROCESSOR arm)
 
 set(tools <absolute path to toolchain directory, for e.g $ENV{HOME}/rpi_rootfs/tools/cross-pi-gcc-10.2.0-1>) # warning change toolchain path here.
-set(rootfs_dir <absolute path to compiled rootfs directory, for e.g $ENV{HOME}/rpi_rootfs/rootfs>) # warning change compiled rootfs path here.
+set(rootfs_dir ${SYSROOT}/rootfs>) # warning change compiled rootfs path here.
 
 set(CMAKE_FIND_ROOT_PATH ${rootfs_dir})
 set(CMAKE_SYSROOT ${rootfs_dir})
