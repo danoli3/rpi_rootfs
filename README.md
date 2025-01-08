@@ -6,7 +6,7 @@
 
 ```sh
 sudo apt update && sudo apt dist-upgrade
-sudo apt-get install build-essential gawk gcc g++ gfortran git texinfo bison libncurses-dev tar wget qemu-user-static rsync rsync
+sudo apt-get install build-essential gawk gcc g++ gfortran git texinfo bison libncurses-dev tar wget qemu-user-static rsync rsync xz-utils
 ```
 
 ### B. Clone this Forked Repository:

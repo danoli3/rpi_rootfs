@@ -110,6 +110,15 @@ function extract_zip_and_mount_image {
 			echo "Error: Failed to execute unzip ${image_filename}"
 			exit 1
 		fi
+	elif [ "${extension}" == "xz" ]; then		
+		unxz -k ${image_filename}
+		ret_value=$?
+		echo "Unxz Return value: ${ret_value}"
+		if [ ${ret_value} -ne 0 ]; then
+			echo "Error: Failed to extract ${image_filename}"
+			exit 1
+		fi
+		echo "Using extracted image file: ${extracted_image_filename}"
 	elif [ "${extension}" == "img" ]; then
 		extracted_image_filename=${image_filename}
 		echo "Using OS image file : ${extracted_image_filename}"
@@ -238,7 +247,7 @@ function run_chroot_cmd_apt_update {
 function create_rootfs {
 	local image_filename=$1
 
-	# Dynamically find the .img.xz file if no argument is provided
+	# Dynamically find the .img file if no argument is provided
 	if [ -z "$image_filename" ]; then
 		export image_filename=$(find . -maxdepth 1 -type f -name "*.img.xz" | head -n 1)
 	fi
