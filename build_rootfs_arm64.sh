@@ -83,6 +83,17 @@ function is_command_installed {
 #
 function extract_zip_and_mount_image {
 	local image_filename=$1
+
+	if [ -z "$image_filename" ]; then
+		export image_filename=$(find . -maxdepth 1 -type f -name "*.img.xz" | head -n 1)
+	fi
+
+	echo "RaspiOS image file name : ${image_filename}"
+	if [ -z "$image_filename" ] || [ ! -e "$image_filename" ]; then
+		echo "RaspiOS image not found"
+		exit 5
+	fi
+	
 	local filename=$(basename -- "$image_filename")
 	local extension="${filename##*.}"
 	local filename_without_ext=$(echo "$filename" | cut -f 1 -d '.')
