@@ -249,12 +249,12 @@ function run_chroot_cmd_apt_update {
 }
 
 #
-function create_rootfs {
+function mount_rootfs {
 	local image_filename=$1
 
-	# Dynamically find the .img file if no argument is provided
+	# Dynamically find the .img.xz file if no argument is provided
 	if [ -z "$image_filename" ]; then
-		export image_filename=$(find . -maxdepth 1 -type f -name "*.img.xz" | head -n 1)
+		image_filename=$(find . -maxdepth 1 -type f -name "*.img.xz" | head -n 1)
 	fi
 
 	echo "RaspiOS image file name : ${image_filename}"
@@ -264,7 +264,24 @@ function create_rootfs {
 	fi
 
 	mkdir -p ${RPI_ROOTFS_BASE}
-	extract_zip_and_mount_image "${image_filename}"
+	extract_zip_and_mount_image ${image_filename}
+}
+
+function create_rootfs {
+	local image_filename=$1
+
+	# Dynamically find the .img.xz file if no argument is provided
+	if [ -z "$image_filename" ]; then
+		image_filename=$(find . -maxdepth 1 -type f -name "*.img.xz" | head -n 1)
+	fi
+
+	echo "RaspiOS image file name : ${image_filename}"
+	if [ -z "$image_filename" ] || [ ! -e "$image_filename" ]; then
+		echo "RaspiOS image not found"
+		exit 5
+	fi
+
+	mkdir -p ${RPI_ROOTFS_BASE}
 	copy_files_from_image
 	update_and_install_raspi_os_imsage
 	create_symlinks
@@ -324,6 +341,11 @@ download)
 	;;
 create)
 	rootfs_must_not_exist # exit this script when the rootfs exists
+	mount_rootfs ${args[1]}
+	create_rootfs ${args[1]}
+	;;
+recreate)
+	rootfs_must_exist
 	create_rootfs ${args[1]}
 	;;
 update)
