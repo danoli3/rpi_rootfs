@@ -10,7 +10,23 @@ import re
 import errno
 
 ## Syncing Directory/File Pattern
-rsync_include = ['etc/', 'lib/','usr/','opt/vc']
+rsync_include = [
+    'etc/',         # Configuration files
+    'lib/',         # Shared libraries
+    'lib64/',       # 64-bit libraries (critical for ARM64)
+    'usr/',         # User binaries, libraries, etc.
+    'opt/vc/',      # VideoCore libraries (legacy support)
+    'boot/',        # Boot files for firmware/kernel
+    'var/',         # Variable data (e.g., logs, spool)
+    'sbin/',        # System binaries
+    'bin/',         # Essential binaries
+    'dev/',         # Device nodes (might be symlinked)
+    'proc/',        # Kernel and process info (often required for emulated environments)
+    'sys/',         # System information (like /proc, might be symlinked)
+]
+
+
+arch_type=aarch64-linux-gnu
 
 ## Rsync Options
 rsync_cmd = ['/usr/bin/rsync']
@@ -161,18 +177,16 @@ def symlink_force(target, link_name):
             print(f"Unexpected error ({e.errno}): {e}")
 
 def process_pkgconfig_link(path):
-    # 
-    pkgconfig_path  = os.path.abspath(path)+'/usr/lib/arm-linux-gnueabihf/pkgconfig'
-    if(os.path.exists(pkgconfig_path)):
-        print("pkg config: %s" % pkgconfig_path)
+    pkgconfig_path = os.path.abspath(path) + '/usr/lib64/aarch64-linux-gnu/pkgconfig'
+    if os.path.exists(pkgconfig_path):
+        print("pkg-config directory exists: ", pkgconfig_path)
         for subdir, dirs, files in os.walk(pkgconfig_path):
             for f in files:
                 filep = os.path.join(subdir, f)
-                target_packageconfig = "../../lib/arm-linux-gnueabihf/pkgconfig/" + f
-                link_packageconfig =  os.path.abspath(path) + "/usr/share/pkgconfig/" + f
-                print("source %s target %s" % (target_packageconfig, link_packageconfig))
-                symlink_force(target_packageconfig, link_packageconfig)
-                
+                target_packageconfig = f"../../lib64/aarch64-linux-gnu/pkgconfig/{f}"
+                link_packageconfig = os.path.abspath(path) + f"/usr/share/pkgconfig/{f}"
+                print("Creating symlink: ", link_packageconfig, " -> ", target_packageconfig)
+                symlink_force(target_packageconfig, link_packageconfig)                
     else:
         sys.stderr.write('ERROR: pkg-config does not exist : %r\n\n' % pkgconfig_path)
 
@@ -237,7 +251,7 @@ def fix_process_ld_scripts(path, filename):
 
 process_ld_scripts_command = [
     '/usr/bin/grep', '-rl',
-    '--include=*.so', '--exclude=*',
+    '--include=*.so',
     '\"GNU ld script\"', '{}'
 ]
 def process_ld_scripts(path):
@@ -252,14 +266,15 @@ def process_ld_scripts(path):
 # ld.so.preload fixing
 #
 ################################################################################
-process_ld_so_preload_command = [ '/usr/bin/grep', '-rl', '--exclude=*', 
+process_ld_so_preload_command = [ '/bin/grep', '-rl', '--exclude=*', 
         '--include=*.preload', '{}', '{}' ]
 def process_ld_so_preload(path):
     grep_command = ' '.join(process_ld_so_preload_command).format('{PLATFORM}',path)
     proc = subprocess.Popen(grep_command,stdout=subprocess.PIPE, shell=True)
     for line in proc.stdout:
         # replacing to 'v7l'
-        inplace_change(line.strip(), '${PLATFORM}', 'v7l')
+        inplace_change(line.strip(), '${PLATFORM}', 'aarch64')
+        print(f"Processing ld.so.preload for path: {path} replacing: {PLATFORM} with aarch64")
 
 ################################################################################
 #

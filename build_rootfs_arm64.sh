@@ -167,7 +167,7 @@ function copy_files_from_image {
 	sudo /bin/chown -R ${USERID}:${GROUPID} ${RPI_ROOTFS_BASE}
 
 	# fixing links and hack library paths
-	./rpi_rootfs.py local ${RPI_ROOTFS_BASE}
+	./rpi_rootfs_arm64.py local ${RPI_ROOTFS_BASE}
 }
 
 function update_and_install_raspi_os_imsage {
@@ -222,9 +222,13 @@ function create_symlinks {
 		ln -sf -r ${RPI_ROOTFS_BASE_ABS_PATH}/usr/include/${GCC_PREFIX}/openssl ${RPI_ROOTFS_BASE_ABS_PATH}/usr/include
 	fi
 
+	ls -a ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib/${GCC_PREFIX}/
+
 	ln -sf ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib/${GCC_PREFIX}/crtn.o ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib/crtn.o
 	ln -sf ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib/${GCC_PREFIX}/crt1.o ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib/crt1.o
 	ln -sf ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib/${GCC_PREFIX}/crti.o ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib/crti.o
+
+	ls -a ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib64/${GCC_PREFIX}/
 
 	ln -sf ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib64/${GCC_PREFIX}/crtn.o ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib64/crtn.o
 	ln -sf ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib64/${GCC_PREFIX}/crt1.o ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib64/crt1.o

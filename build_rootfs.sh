@@ -176,8 +176,11 @@ function update_and_install_raspi_os_imsage {
 	chmod 777 ${RPI_ROOTFS_BASE}/tmp
 	cp ${QEMU_ARM_STATIC} ${RPI_ROOTFS_BASE}/${QEMU_ARM_STATIC}
 
-	sudo chroot ${RPI_ROOTFS_BASE} /usr/bin/qemu-arm-static \
-		/bin/bash /root/${UPDATE_INSTALL_SCRIPT}
+	#sudo chroot ${RPI_ROOTFS_BASE} /usr/bin/qemu-arm-static \
+	#	/bin/bash /root/${UPDATE_INSTALL_SCRIPT}
+
+	sudo chroot --userspec=$(id -u):$(id -g) ${RPI_ROOTFS_BASE} /usr/bin/qemu-arm-static /bin/bash /root/${UPDATE_INSTALL_SCRIPT}
+
 
 	# fixing links and hack library paths again
 	./rpi_rootfs.py local ${RPI_ROOTFS_BASE}
@@ -219,6 +222,8 @@ function create_symlinks {
 	else
 		ln -sf -r ${RPI_ROOTFS_BASE_ABS_PATH}/usr/include/arm-linux-gnueabihf/openssl ${RPI_ROOTFS_BASE_ABS_PATH}/usr/include
 	fi
+
+	ls -a ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib/arm-linux-gnueabihf/
 
 	ln -sf ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib/arm-linux-gnueabihf/crtn.o ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib/crtn.o
 	ln -sf ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib/arm-linux-gnueabihf/crt1.o ${RPI_ROOTFS_BASE_ABS_PATH}/usr/lib/crt1.o
