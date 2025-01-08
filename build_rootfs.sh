@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd $SCRIPT_DIR
+
 #
 function print_usage {
 	echo "Usage: $0 command [options]"
@@ -302,6 +305,8 @@ download)
 	is_command_installed wget
 	find "$image_dir" -maxdepth 1 -type f -name "*.img.xz" -exec rm -v {} \;
 	wget --trust-server-names https://downloads.raspberrypi.org/raspios_armhf_latest
+	export image_filename=$(find . -maxdepth 1 -type f -name "*.img.xz" | head -n 1)
+	echo "  Downloaded $image_filename "
 	;;
 create)
 	rootfs_must_not_exist # exit this script when the rootfs exists
